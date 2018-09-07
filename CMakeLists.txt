@@ -6,12 +6,23 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   tf
   std_msgs
+  geometry_msgs
   sensor_msgs
   nav_msgs
 )
 
 catkin_package(
 )
+
+find_package(cmake_modules REQUIRED)
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+add_definitions(${EIGEN_DEFINITIONS})
+add_definitions(-std=c++11)
+
+find_package(PCL REQUIRED)
+include_directories(include ${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
 
 include_directories(
   include ${catkin_INCLUDE_DIRS}
