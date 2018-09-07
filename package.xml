@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>ROS package for map building</description>
 
-  <maintainer email="lwb16@mails.tsinghua.edu.cn">zx</maintainer>
+  <maintainer email="lwb16@mails.tsinghua.edu.cn">lwb</maintainer>
   <license>MIT</license>
 
 

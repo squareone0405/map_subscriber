@@ -23,6 +23,7 @@ add_definitions(-std=c++11)
 find_package(PCL REQUIRED)
 include_directories(include ${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 include_directories(
   include ${catkin_INCLUDE_DIRS}
@@ -37,4 +38,5 @@ add_executable(map_subscriber
 add_dependencies(map_subscriber ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(map_subscriber
   ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
 )
