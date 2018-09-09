@@ -32,7 +32,7 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     cout<<"cloud height: "<<cloud->height<<endl;
     cout<<"cloud width: "<<cloud->width<<endl;
     if((counter%20) == 0){
-        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/output" + std::to_string(counter) + ".pcd", *cloud);
+        pcl::io::savePCDFileASCII ("/home/odroid/Desktop/output" + std::to_string(counter) + ".pcd", *cloud);
         sensor_msgs::PointCloud2 msg;
         pcl::toROSMsg (*cloud, msg);
         pointcloud_pub.publish(msg);
