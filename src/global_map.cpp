@@ -1,31 +1,21 @@
 #include "global_map.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
 void GlobalMap::tf_callback(const tf::tfMessage::ConstPtr &tf_msg){
-    auto transforms= tf_msg->transforms;
-    auto data_frame = string("undefined");
-    auto data = transforms[1].transform;
-    for(auto it = transforms.begin(); it!=transforms.end(); it++){
-        cout<<"frame id of tf_msg : "<<(*it).child_frame_id<<endl;
-        if((*it).child_frame_id == string("laser")){
-            data = (*it).transform;
-            data_frame = string("laser");
-        }
-    }
-    if(data_frame != string("laser")){
+    auto transforms = tf_msg->transforms;
+    auto transform = transforms[0].transform;
+    if(transforms[0].child_frame_id != string("curr_position"))
         return;
-    }
-    x = data.translation.x;
-    y = data.translation.y;
-    z = data.translation.z;
+    x = transform.translation.x;
+    y = transform.translation.y;
+    z = transform.translation.z;
     cout<< x << '\t' << y << '\t' << z <<endl;
 }
 
 void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg){
-    cout<<"height: "<<cloud_msg->height<<endl;
-    cout<<"width: "<<cloud_msg->width<<endl;
     pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromROSMsg (*cloud_msg, *temp_cloud);
@@ -37,8 +27,14 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     pcl::transformPointCloud (*temp_cloud, *transformed_cloud, trans);
     *cloud += *transformed_cloud;
     counter++;
-    cout<<"counter: "<<counter<<endl;
-    if(counter == 20){
-        pcl::io::savePCDFileASCII ("/home/squareone/output.pcd", *cloud);
+    cout<<"num of clouds: "<<counter<<endl;
+    cout<<"num of points: "<<cloud->points.size()<<endl;
+    cout<<"cloud height: "<<cloud->height<<endl;
+    cout<<"cloud width: "<<cloud->width<<endl;
+    if((counter%20) == 0){
+        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/output" + std::to_string(counter) + ".pcd", *cloud);
+        sensor_msgs::PointCloud2 msg;
+        pcl::toROSMsg (*cloud, msg);
+        pointcloud_pub.publish(msg);
     }
 }

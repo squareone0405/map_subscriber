@@ -21,9 +21,13 @@ class GlobalMap{
 public:
     GlobalMap(ros::NodeHandle &n){
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+        x = 0.0;
+        y = 0.0;
+        z = 0.0;
         tf_sub = n.subscribe("tf", 1000, &GlobalMap::tf_callback, this);
         pointcloud_sub = n.subscribe("scan_matched_points2", 1000, &GlobalMap::pointcloud_callback, this);
         gridmap_sub = n.subscribe("nav_msgs", 1000, &GlobalMap::gridmap_callback, this);
+        pointcloud_pub = n.advertise<sensor_msgs::PointCloud2>("global_pointcloud", 1000);
     }
     void start(){
         while(ros::ok()){
@@ -34,7 +38,8 @@ private:
     ros::Subscriber tf_sub;
     ros::Subscriber pointcloud_sub;
     ros::Subscriber gridmap_sub;
-    double x, y, z;
+    ros::Publisher pointcloud_pub;
+    float x, y, z;
     int counter = 0;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
     void tf_callback(const tf::tfMessage::ConstPtr &tf_msg);
