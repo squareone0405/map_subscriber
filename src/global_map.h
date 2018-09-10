@@ -3,7 +3,6 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
 #include <tf/tfMessage.h>
-#include <nav_msgs/OccupancyGrid.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Transform.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -26,7 +25,6 @@ public:
         z = 0.0;
         tf_sub = n.subscribe("tf", 1000, &GlobalMap::tf_callback, this);
         pointcloud_sub = n.subscribe("scan_matched_points2", 1000, &GlobalMap::pointcloud_callback, this);
-        gridmap_sub = n.subscribe("nav_msgs", 1000, &GlobalMap::gridmap_callback, this);
         pointcloud_pub = n.advertise<sensor_msgs::PointCloud2>("global_pointcloud", 1000);
     }
     void start(){
@@ -37,14 +35,10 @@ public:
 private:
     ros::Subscriber tf_sub;
     ros::Subscriber pointcloud_sub;
-    ros::Subscriber gridmap_sub;
     ros::Publisher pointcloud_pub;
     float x, y, z;
     int counter = 0;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
     void tf_callback(const tf::tfMessage::ConstPtr &tf_msg);
     void pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg);
-    void gridmap_callback(const nav_msgs::OccupancyGrid::ConstPtr &msg){
-        cout<<"get gridmap"<<endl;
-    }
 };
