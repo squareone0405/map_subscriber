@@ -29,18 +29,22 @@ bool GlobalMap::isTooClose(geometry_msgs::Transform transform_new) {
 }
 
 void GlobalMap::tf_callback(const tf::tfMessage::ConstPtr &tf_msg){
+    hasMoved = false;
     auto transforms = tf_msg->transforms;
     auto transform_new = transforms[0].transform;
     if(transforms[0].child_frame_id != string("curr_position"))
         return;
     if(isTooClose(transform_new))
-        return;    
+        return;  
+    hasMoved = true; 
     cout<< transform.translation.x << '\t' << transform.translation.y << '\t' << transform.translation.z <<endl;
 }
 
 void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg) {
-    if(!hasMoved)
+    if(!hasMoved){
+        cout<<"reject! no move!"<<endl;
         return;
+    }
     pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromROSMsg (*cloud_msg, *temp_cloud);
