@@ -19,7 +19,7 @@ using namespace std;
 class GlobalMap{
 public:
     GlobalMap(ros::NodeHandle &n){
-        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+        cloud.reset((new pcl::PointCloud<pcl::PointXYZ>));
         x = 0.0;
         y = 0.0;
         z = 0.0;

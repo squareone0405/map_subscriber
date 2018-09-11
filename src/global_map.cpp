@@ -18,12 +18,15 @@ void GlobalMap::tf_callback(const tf::tfMessage::ConstPtr &tf_msg){
 void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg){
     pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    cout<<"init done"<<endl;
     pcl::fromROSMsg (*cloud_msg, *temp_cloud);
+    cout<<"parse msg"<<endl;
     Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();
     trans(0, 3) = x;
     trans(1, 3) = y;
     trans(2, 3) = z;
     pcl::transformPointCloud (*temp_cloud, *transformed_cloud, trans);
+    cout<<"transformed"<<endl;
     *cloud += *transformed_cloud;
     counter++;
     cout<<"num of clouds: "<<counter<<endl;
