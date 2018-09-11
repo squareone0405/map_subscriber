@@ -36,12 +36,12 @@ private:
     ros::Subscriber tf_sub;
     ros::Subscriber pointcloud_sub;
     ros::Publisher pointcloud_pub;
-    geometry_msgs::Transform transform;
-    bool hasMoved;
+    geometry_msgs::Transform transform_prev;
+    geometry_msgs::Transform transform_curr;
     float roll, yaw, pitch;
     int counter = 0;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
     void tf_callback(const tf::tfMessage::ConstPtr &tf_msg);
     void pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg);
-    bool isTooClose(geometry_msgs::Transform transform_new);
+    bool isTooClose();
 };
