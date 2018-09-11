@@ -19,11 +19,10 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromROSMsg (*cloud_msg, *temp_cloud);
-    Eigen::Matrix4f trans = Eigen::Matrix4f::Zero();
+    Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();
     trans(0, 3) = x;
     trans(1, 3) = y;
     trans(2, 3) = z;
-    trans(3, 3) = 1;
     pcl::transformPointCloud (*temp_cloud, *transformed_cloud, trans);
     *cloud += *transformed_cloud;
     counter++;
