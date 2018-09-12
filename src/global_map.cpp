@@ -32,18 +32,15 @@ bool GlobalMap::isTooClose() {
         pitch = pitch_new;
         yaw = yaw_new;
     }
-    cout<<isTooCloseFlag<<endl;
     return isTooCloseFlag;
 }
 
 void GlobalMap::tf_callback(const tf::tfMessage::ConstPtr &tf_msg){
-    cout<<"tf_begin"<<endl;
     auto transforms = tf_msg->transforms;
     auto transform_new = transforms[0].transform;
     if(transforms[0].child_frame_id != string("curr_position"))
         return;
     transform_curr = transform_new;
-    cout<<"tf_done"<<endl;
 }
 
 void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg) {
@@ -67,8 +64,9 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
         cloud_queue.pop();
     }
     counter++;
+    cout<<"counter: "<<counter<<endl;
     //cout<<"num of points: "<<cloud->points.size()<<endl;
-    if( (counter%50) == 0 ){//for testing
+    if( (counter%10) == 0 ){//for testing
         queue< pcl::PointCloud<pcl::PointXYZ>::Ptr > clone_queue = cloud_queue;
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
         while(!clone_queue.empty()){
