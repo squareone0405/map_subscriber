@@ -60,7 +60,8 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     cloud_queue.push(transformed_cloud);
     if(cloud_queue.size() >= queue_size) {
         pcl::PointCloud<pcl::PointXYZ>::Ptr temp = cloud_queue.front();
-        delete temp.get();
+        //delete temp.get();
+        temp.reset();
         cloud_queue.pop();
     }
     counter++;
@@ -79,6 +80,7 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
         sensor_msgs::PointCloud2 msg;
         pcl::toROSMsg (*cloud, msg);
         pointcloud_pub.publish(msg);
-        delete cloud.get();
+        //delete cloud.get();
+        cloud.reset();
     }
 }
