@@ -63,10 +63,8 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     *cloud += *transformed_cloud;
     counter++;
     cout<<"num of clouds: "<<counter<<endl;
-    /*cout<<"num of points: "<<cloud->points.size()<<endl;
-    cout<<"cloud height: "<<cloud->height<<endl;
-    cout<<"cloud width: "<<cloud->width<<endl;*/
-    if((counter%10) == 0){
+    //cout<<"num of points: "<<cloud->points.size()<<endl;
+    if((counter%100) == 0){
         pcl::io::savePCDFileASCII ("/home/odroid/Desktop/output/output" + std::to_string(counter) + ".pcd", *cloud);
         sensor_msgs::PointCloud2 msg;
         pcl::toROSMsg (*cloud, msg);
