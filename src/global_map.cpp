@@ -57,7 +57,7 @@ void GlobalMap::dim_reduction(pcl::PointCloud<pcl::PointXY>::Ptr cloud_2d, pcl::
 void GlobalMap::tf_callback(const tf::tfMessage::ConstPtr &tf_msg){
     auto transforms = tf_msg->transforms;
     auto transform_new = transforms[0].transform;
-    if(transforms[0].child_frame_id != string("laser"))
+    if(transforms[0].child_frame_id != string("curr_position"))
         return;
     transform_curr = transform_new;
 }
@@ -89,7 +89,7 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
         cloud_queue.pop();
     }
     counter++;
-    cout<<"counter: "<<counter<<endl;
+    cout<<"counter: "<<"\t"<<"\t"<<"\t"<<"\t"<<"\t"<<counter<<endl;
     //cout<<"num of points: "<<cloud->points.size()<<endl;
     if( (counter%10) == 0 ) {//for testing
         queue< pcl::PointCloud<pcl::PointXY>::Ptr > clone_queue = cloud_queue;
@@ -100,7 +100,7 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
             clone_queue.pop();
         } 
         //pcl::io::savePCDFileASCII ("/home/odroid/Desktop/output/output" + std::to_string(counter) + ".pcd", *cloud);
-        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/opengr_test/output/output" + std::to_string(counter) + ".pcd", *cloud);
+        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/icp_2d_test/output/output" + std::to_string(counter) + ".pcd", *cloud);
         sensor_msgs::PointCloud2 msg;
         pcl::toROSMsg (*cloud, msg);
         pointcloud_pub.publish(msg);
