@@ -91,7 +91,7 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     counter++;
     cout<<"counter: "<<counter<<endl;
     //cout<<"num of points: "<<cloud->points.size()<<endl;
-    if( (counter%10) == 0 ){//for testing
+    if( (counter%10) == 0 ) {//for testing
         queue< pcl::PointCloud<pcl::PointXY>::Ptr > clone_queue = cloud_queue;
         pcl::PointCloud<pcl::PointXY>::Ptr cloud(new pcl::PointCloud<pcl::PointXY>);
         while(!clone_queue.empty()){
