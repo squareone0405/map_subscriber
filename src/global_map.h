@@ -33,7 +33,7 @@ public:
         }
     }
 private:
-    const float keep_prob = 0.5;
+    const float keep_prob = 1.0;
     const int queue_size = 10;
 
     ros::Subscriber tf_sub;
@@ -44,7 +44,7 @@ private:
     geometry_msgs::Transform transform_curr;
     float roll, yaw, pitch;
 
-    queue< pcl::PointCloud<pcl::PointXYZ>::Ptr > cloud_queue;
+    queue< pcl::PointCloud<pcl::PointXY>::Ptr > cloud_queue;
 
     int counter = 0;
 
@@ -52,5 +52,5 @@ private:
     void pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg);
     bool isTooClose();
     void sparsification(pcl::PointCloud<pcl::PointXYZ>& dense_cloud);
-    void flatten(pcl::PointCloud<pcl::PointXYZ>& cloud_3d);
+    void dim_reduction(pcl::PointCloud<pcl::PointXY>::Ptr cloud_2d, pcl::PointCloud<pcl::PointXYZ>& cloud_3d);
 };

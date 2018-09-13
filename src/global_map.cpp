@@ -9,7 +9,6 @@ bool GlobalMap::isTooClose() {
     bool isTooCloseFlag = true;
     float dis = pow(transform_prev.translation.x - transform_curr.translation.x, 2) 
     + pow(transform_prev.translation.y - transform_curr.translation.y, 2);
-    //+ pow(transform_prev.translation.z - transform_curr.translation.z, 2);
     cout<<"dis: "<<dis<<endl;
     if(dis > 0.0025){
         isTooCloseFlag = false;
@@ -45,16 +44,20 @@ void GlobalMap::sparsification(pcl::PointCloud<pcl::PointXYZ>& dense_cloud){
     }
 }
 
-void GlobalMap::flatten(pcl::PointCloud<pcl::PointXYZ>& cloud_3d){
+void GlobalMap::dim_reduction(pcl::PointCloud<pcl::PointXY>::Ptr cloud_2d, pcl::PointCloud<pcl::PointXYZ>& cloud_3d) {
+    cloud_2d.reset(new (pcl::PointCloud<pcl::PointXY>));
     for(int i = 0; i < cloud_3d.points.size(); ++i){
-        cloud_3d.points[i].z = 0;
+        pcl::PointXY temp;
+        temp.x = cloud_3d.points[i].x;
+        temp.y = cloud_3d.points[i].y;
+        cloud_2d->push_back(temp);
     }
 }
 
 void GlobalMap::tf_callback(const tf::tfMessage::ConstPtr &tf_msg){
     auto transforms = tf_msg->transforms;
     auto transform_new = transforms[0].transform;
-    if(transforms[0].child_frame_id != string("curr_position"))
+    if(transforms[0].child_frame_id != string("laser"))
         return;
     transform_curr = transform_new;
 }
@@ -66,21 +69,22 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     }
     pcl::PointCloud<pcl::PointXYZ>::Ptr dense_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXY>::Ptr flattened_cloud(new pcl::PointCloud<pcl::PointXY>);
+
     pcl::fromROSMsg (*cloud_msg, *dense_cloud);
 
     sparsification(*dense_cloud);
-    flatten(*dense_cloud);
 
     Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();
     trans(0, 3) = transform_prev.translation.x;
     trans(1, 3) = transform_prev.translation.y;
-    trans(2, 3) = transform_prev.translation.z;
-    cout<< transform_prev.translation.x << '\t' << transform_prev.translation.y << '\t' << transform_prev.translation.z <<endl;
     pcl::transformPointCloud (*dense_cloud, *transformed_cloud, trans);
-    cloud_queue.push(transformed_cloud);
+
+    dim_reduction(flattened_cloud, *transformed_cloud);
+
+    cloud_queue.push(flattened_cloud);
     if(cloud_queue.size() >= queue_size) {
-        pcl::PointCloud<pcl::PointXYZ>::Ptr temp = cloud_queue.front();
-        //delete temp.get();
+        pcl::PointCloud<pcl::PointXY>::Ptr temp = cloud_queue.front();
         temp.reset();
         cloud_queue.pop();
     }
@@ -88,10 +92,10 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     cout<<"counter: "<<counter<<endl;
     //cout<<"num of points: "<<cloud->points.size()<<endl;
     if( (counter%10) == 0 ){//for testing
-        queue< pcl::PointCloud<pcl::PointXYZ>::Ptr > clone_queue = cloud_queue;
-        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+        queue< pcl::PointCloud<pcl::PointXY>::Ptr > clone_queue = cloud_queue;
+        pcl::PointCloud<pcl::PointXY>::Ptr cloud(new pcl::PointCloud<pcl::PointXY>);
         while(!clone_queue.empty()){
-            pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud = clone_queue.front();
+            pcl::PointCloud<pcl::PointXY>::Ptr temp_cloud = clone_queue.front();
             *cloud += *temp_cloud;
             clone_queue.pop();
         } 
@@ -100,7 +104,6 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
         sensor_msgs::PointCloud2 msg;
         pcl::toROSMsg (*cloud, msg);
         pointcloud_pub.publish(msg);
-        //delete cloud.get();
         cloud.reset();
     }
 }
