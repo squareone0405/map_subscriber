@@ -33,7 +33,7 @@ public:
         }
     }
 private:
-    const float keep_prob = 0.5;
+    const float keep_prob = 1.0;
     const int queue_size = 10;
 
     ros::Subscriber tf_sub;

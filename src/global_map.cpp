@@ -74,7 +74,7 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();
     trans(0, 3) = transform_prev.translation.x;
     trans(1, 3) = transform_prev.translation.y;
-    trans(2, 3) = transform_prev.translation.z;
+    //trans(2, 3) = transform_prev.translation.z;
     cout<< transform_prev.translation.x << '\t' << transform_prev.translation.y << '\t' << transform_prev.translation.z <<endl;
     pcl::transformPointCloud (*dense_cloud, *transformed_cloud, trans);
     cloud_queue.push(transformed_cloud);
