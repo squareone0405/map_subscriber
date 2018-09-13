@@ -8,8 +8,8 @@ using namespace std;
 bool GlobalMap::isTooClose() {
     bool isTooCloseFlag = true;
     float dis = pow(transform_prev.translation.x - transform_curr.translation.x, 2) 
-    + pow(transform_prev.translation.y - transform_curr.translation.y, 2) 
-    + pow(transform_prev.translation.z - transform_curr.translation.z, 2);
+    + pow(transform_prev.translation.y - transform_curr.translation.y, 2);
+    //+ pow(transform_prev.translation.z - transform_curr.translation.z, 2);
     cout<<"dis: "<<dis<<endl;
     if(dis > 0.0025){
         isTooCloseFlag = false;
@@ -45,6 +45,12 @@ void GlobalMap::sparsification(pcl::PointCloud<pcl::PointXYZ>& dense_cloud){
     }
 }
 
+void GlobalMap::flatten(pcl::PointCloud<pcl::PointXYZ>& cloud_3d){
+    for(int i = 0; i < cloud_3d.points.size(); ++i){
+        cloud_3d.points[i].z = 0;
+    }
+}
+
 void GlobalMap::tf_callback(const tf::tfMessage::ConstPtr &tf_msg){
     auto transforms = tf_msg->transforms;
     auto transform_new = transforms[0].transform;
@@ -61,7 +67,9 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     pcl::PointCloud<pcl::PointXYZ>::Ptr dense_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr transformed_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromROSMsg (*cloud_msg, *dense_cloud);
+
     sparsification(*dense_cloud);
+    flatten(*dense_cloud);
 
     Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();
     trans(0, 3) = transform_prev.translation.x;
@@ -87,8 +95,8 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
             *cloud += *temp_cloud;
             clone_queue.pop();
         } 
-        pcl::io::savePCDFileASCII ("/home/odroid/Desktop/output/output" + std::to_string(counter) + ".pcd", *cloud);
-        //pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/opengr_test/output/output" + std::to_string(counter) + ".pcd", *cloud);
+        //pcl::io::savePCDFileASCII ("/home/odroid/Desktop/output/output" + std::to_string(counter) + ".pcd", *cloud);
+        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/opengr_test/output/output" + std::to_string(counter) + ".pcd", *cloud);
         sensor_msgs::PointCloud2 msg;
         pcl::toROSMsg (*cloud, msg);
         pointcloud_pub.publish(msg);

@@ -33,8 +33,8 @@ public:
         }
     }
 private:
-    const float keep_prob = 0.2;
-    const int queue_size = 80;
+    const float keep_prob = 0.5;
+    const int queue_size = 10;
 
     ros::Subscriber tf_sub;
     ros::Subscriber pointcloud_sub;
@@ -52,4 +52,5 @@ private:
     void pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cloud_msg);
     bool isTooClose();
     void sparsification(pcl::PointCloud<pcl::PointXYZ>& dense_cloud);
+    void flatten(pcl::PointCloud<pcl::PointXYZ>& cloud_3d);
 };
