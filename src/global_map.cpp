@@ -89,6 +89,10 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
     //cout<<"num of points: "<<cloud->points.size()<<endl;
     if( (counter%10) == 0 ){//for testing
         queue< pcl::PointCloud<pcl::PointXYZ>::Ptr > clone_queue = cloud_queue;
+
+        pcl::PointCloud<pcl::PointXYZ>::Ptr lastest_cloud = cloud_queue.back();
+        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/corner_match/output/lastest" + std::to_string(counter) + ".pcd", *lastest_cloud);
+
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
         while(!clone_queue.empty()){
             pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud = clone_queue.front();
@@ -96,7 +100,7 @@ void GlobalMap::pointcloud_callback(const sensor_msgs::PointCloud2::ConstPtr &cl
             clone_queue.pop();
         } 
         //pcl::io::savePCDFileASCII ("/home/odroid/Desktop/output/output" + std::to_string(counter) + ".pcd", *cloud);
-        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/opengr_test/output/output" + std::to_string(counter) + ".pcd", *cloud);
+        pcl::io::savePCDFileASCII ("/home/squareone/Desktop/throne/corner_match/output/output" + std::to_string(counter) + ".pcd", *cloud);
         sensor_msgs::PointCloud2 msg;
         pcl::toROSMsg (*cloud, msg);
         pointcloud_pub.publish(msg);
